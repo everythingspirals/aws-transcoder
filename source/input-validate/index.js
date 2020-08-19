@@ -20,6 +20,12 @@ exports.handler = async (event) => {
 
     const s3 = new AWS.S3();
     let data;
+    const key = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, " "));
+
+    //Override GUID to ObjectId
+    let videoId = key.split('/');
+    let guid = videoId.length && videoId[videoId.length - 1];
+    event.guid = guid;
 
     try {
         // Default configuration for the workflow is built using the enviroment variables.
@@ -48,8 +54,9 @@ exports.handler = async (event) => {
             case 'Metadata':
                 console.log('Validating Metadata file::');
 
-                const key = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, " "));
                 data.srcMetadataFile = key;
+
+     
 
                 // Download json metadata file from s3
                 const metadata = await s3.getObject({ Bucket: data.srcBucket, Key: key }).promise();
@@ -72,7 +79,7 @@ exports.handler = async (event) => {
                 break;
 
             case 'Video':
-                data.srcVideo = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, " "));
+                data.srcVideo = decodeURIComponent(key);
                 break;
 
             default:

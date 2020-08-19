@@ -26,64 +26,64 @@ let PutNotification = async (config) => {
                     LambdaFunctionConfigurations: [
                         {
                             Events: ['s3:ObjectCreated:*'],
-                            LambdaFunctionArn: config.IngestArn,
-                            Filter: {
-                                Key: {
-                                    FilterRules: [{
-                                        Name: 'suffix',
-                                        Value: '.mpg'
-                                    }]
-                                }
-                            }
-                        },
-                        {
-                            Events: ['s3:ObjectCreated:*'],
-                            LambdaFunctionArn: config.IngestArn,
-                            Filter: {
-                                Key: {
-                                    FilterRules: [{
-                                        Name: 'suffix',
-                                        Value: '.mp4'
-                                    }]
-                                }
-                            }
-                        },
-                        {
-                            Events: ['s3:ObjectCreated:*'],
-                            LambdaFunctionArn: config.IngestArn,
-                            Filter: {
-                                Key: {
-                                    FilterRules: [{
-                                        Name: 'suffix',
-                                        Value: '.m4v'
-                                    }]
-                                }
-                            }
-                        },
-                        {
-                            Events: ['s3:ObjectCreated:*'],
-                            LambdaFunctionArn: config.IngestArn,
-                            Filter: {
-                                Key: {
-                                    FilterRules: [{
-                                        Name: 'suffix',
-                                        Value: '.mov'
-                                    }]
-                                }
-                            }
-                        },
-                        {
-                            Events: ['s3:ObjectCreated:*'],
-                            LambdaFunctionArn: config.IngestArn,
-                            Filter: {
-                                Key: {
-                                    FilterRules: [{
-                                        Name: 'suffix',
-                                        Value: '.m2ts'
-                                    }]
-                                }
-                            }
+                            LambdaFunctionArn: config.IngestArn
+                            // Filter: {
+                            //     Key: {
+                            //         FilterRules: [{
+                            //             Name: 'suffix',
+                            //             Value: '.mpg'
+                            //         }]
+                            //     }
+                            // }
                         }
+                        // {
+                        //     Events: ['s3:ObjectCreated:*'],
+                        //     LambdaFunctionArn: config.IngestArn,
+                        //     Filter: {
+                        //         Key: {
+                        //             FilterRules: [{
+                        //                 Name: 'suffix',
+                        //                 Value: '.mp4'
+                        //             }]
+                        //         }
+                        //     }
+                        // },
+                        // {
+                        //     Events: ['s3:ObjectCreated:*'],
+                        //     LambdaFunctionArn: config.IngestArn,
+                        //     Filter: {
+                        //         Key: {
+                        //             FilterRules: [{
+                        //                 Name: 'suffix',
+                        //                 Value: '.m4v'
+                        //             }]
+                        //         }
+                        //     }
+                        // },
+                        // {
+                        //     Events: ['s3:ObjectCreated:*'],
+                        //     LambdaFunctionArn: config.IngestArn,
+                        //     Filter: {
+                        //         Key: {
+                        //             FilterRules: [{
+                        //                 Name: 'suffix',
+                        //                 Value: '.mov'
+                        //             }]
+                        //         }
+                        //     }
+                        // },
+                        // {
+                        //     Events: ['s3:ObjectCreated:*'],
+                        //     LambdaFunctionArn: config.IngestArn,
+                        //     Filter: {
+                        //         Key: {
+                        //             FilterRules: [{
+                        //                 Name: 'suffix',
+                        //                 Value: '.m2ts'
+                        //             }]
+                        //         }
+                        //     }
+                        // }
                     ]
                 }
             };

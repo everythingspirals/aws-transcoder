@@ -33,7 +33,7 @@ const getHlsGroup = (outputPath) => ({
         HlsGroupSettings: {
             SegmentLength: 5,
             MinSegmentLength: 0,
-            Destination: `${outputPath}/hls/`
+            Destination: `${outputPath}/playback/stream`
         }
     },
     Outputs: []
