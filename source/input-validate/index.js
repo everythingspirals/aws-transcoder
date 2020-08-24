@@ -41,23 +41,32 @@ exports.handler = async (event) => {
             cloudFront: process.env.CloudFront,
             frameCapture: JSON.parse(process.env.FrameCapture),
             archiveSource:  process.env.ArchiveSource,
-            jobTemplate_2160p: process.env.MediaConvert_Template_2160p,
-            jobTemplate_1080p: process.env.MediaConvert_Template_1080p,
-            jobTemplate_720p: process.env.MediaConvert_Template_720p,
+            landscape_2160p: process.env.Landscape_Template_2160p,
+            landscape_1080p: process.env.Landscape_Template_1080p,
+            landscape_720p: process.env.Landscape_Template_720p,
+            landscape_480p: process.env.Landscape_Template_480p,
+            landscape_360p: process.env.Landscape_Template_360p,
+            landscape_240p: process.env.Landscape_Template_240p,
+            portrait_2160p: process.env.Portrait_Template_2160p,
+            portrait_1080p: process.env.Portrait_Template_1080p,
+            portrait_720p: process.env.Portrait_Template_720p,
+            portrait_480p: process.env.Portrait_Template_480p,
+            portrait_360p: process.env.Portrait_Template_360p,
+            portrait_240p: process.env.Portrait_Template_240p,
             inputRotate: process.env.InputRotate,
             acceleratedTranscoding: process.env.AcceleratedTranscoding,
             enableSns:JSON.parse(process.env.EnableSns),
             enableSqs:JSON.parse(process.env.EnableSqs)
         };
 
+        console.log(data);
+
         switch (event.workflowTrigger) {
             case 'Metadata':
                 console.log('Validating Metadata file::');
 
                 data.srcMetadataFile = key;
-
-     
-
+ 
                 // Download json metadata file from s3
                 const metadata = await s3.getObject({ Bucket: data.srcBucket, Key: key }).promise();
 

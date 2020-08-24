@@ -41,7 +41,11 @@ exports.handler = async (event) => {
         event.srcWidth = mediaInfo.video[0].width;
 
         // Determine encoding by matching the srcHeight to the nearest profile.
-        const profiles = [1080, 720, 480, 360, 240];
+        const landscapeProfiles = [1080, 720, 480, 360, 240];
+        const portraitProfiles = [1920, 1280, 854, 640, 426];
+
+        const profiles = (event.srcHeight > event.srcWidth) ? portraitProfiles : landscapeProfiles;
+
         let lastProfile;
         let encodeProfile;
 
@@ -55,16 +59,17 @@ exports.handler = async (event) => {
             lastProfile = profile;
         });
 
+        console.log(encodeProfile);
         event.encodingProfile = encodeProfile;
 
         if (event.frameCapture) {
             // Match Height x Width with the encoding profile.
             const ratios = {
-                '1080': 1920,
-                '720': 1280,
-                '480': 854,
-                '360': 640,
-                '240': 426
+                1080: 1920,
+                720: 1280,
+                480: 854,
+                360: 640,
+                240: 426
             };
 
             event.frameCaptureHeight = encodeProfile;
@@ -73,14 +78,20 @@ exports.handler = async (event) => {
 
         // Update:: added support to pass in a custom encoding Template instead of using the
         // solution defaults
+
         if (!event.jobTemplate) {
-            // Match the jobTemplate to the encoding Profile.
+            // Match the landscape to the encoding Profile.
             const jobTemplates = {
-                '1080': event.jobTemplate_1080p,
-                '720': event.jobTemplate_720p,
-                '480': event.jobTemplate_480p,
-                '360': event.jobTemplate_360p,
-                '240': event.jobTemplate_240p,
+                1080: event.landscape_1080p,
+                720: event.landscape_720p,
+                480: event.landscape_480p,
+                360: event.landscape_360p,
+                240: event.landscape_240p,
+                1920: event.portrait_1080p,
+                1280: event.portrait_720p,
+                854: event.portrait_480p,
+                640: event.portrait_360p,
+                426: event.portrait_240p
             };
 
             event.jobTemplate = jobTemplates[encodeProfile];

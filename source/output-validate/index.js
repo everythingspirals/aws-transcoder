@@ -109,8 +109,8 @@ exports.handler = async (event) => {
     data.thumbNailsUrls = [];
 
     params = {
-      Bucket: data.destBucket,
-      Prefix: `${data.guid}/thumbnails/`,
+      Bucket: data.destBucket.split('/')[0],
+      Prefix: `videos/${data.guid}/thumbnails/`,
     };
 
     let thumbNails = await s3.listObjects(params).promise();

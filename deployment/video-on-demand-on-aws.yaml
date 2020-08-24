@@ -1407,7 +1407,7 @@ Resources:
                   "BooleanEquals": true,
                   "Next": "Custom jobTemplate"
                 },
-                        {
+                {
                   "Variable": "$.encodingProfile ",
                   "NumericEquals": 2160,
                   "Next": "jobTemplate 2160p"
@@ -1420,6 +1420,16 @@ Resources:
                 {
                   "Variable": "$.encodingProfile ",
                   "NumericEquals": 720,
+                  "Next": "jobTemplate 720p"
+                },
+                {
+                  "Variable": "$.encodingProfile ",
+                  "NumericEquals": 1920,
+                  "Next": "jobTemplate 1080p"
+                },
+                {
+                  "Variable": "$.encodingProfile ",
+                  "NumericEquals": 1280,
                   "Next": "jobTemplate 720p"
                 }
               ]
