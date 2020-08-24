@@ -1,4 +1,4 @@
-Description: "(SO0021) - Video On Demand workflow with AWS Step Functions, MediaConvert, MediaPackage, S3, CloudFront and DynamoDB. Version %%VERSION%%"
+Description: "(SO0021) - Video On Demand workflow with AWS Step Functions, MediaConvert, MediaPackage, S3, CloudFront and DynamoDB. Version v5.1.0"
 
 Parameters:
 
@@ -109,8 +109,8 @@ Metadata:
 Mappings:
   SourceCode:
     General:
-      S3Bucket: "%%BUCKET_NAME%%"
-      KeyPrefix: "%%SOLUTION_NAME%%/%%VERSION%%"
+      S3Bucket: "solutions"
+      KeyPrefix: "video-on-demand-on-aws/v5.1.0"
   AnonymousData:
     SendAnonymousData:
       Data: Yes
@@ -398,6 +398,13 @@ Resources:
       LoggingConfiguration:
         DestinationBucketName: !Ref Logs
         LogFilePrefix: s3-access/
+      CorsConfiguration:
+        CorsRules:
+          - AllowedMethods: [GET, POST, PUT, DELETE]
+            AllowedOrigins: ['*']
+            AllowedHeaders: ['*']
+            ExposedHeaders: [Etag]
+            MaxAge: 10000  
       LifecycleConfiguration:
         Rules:
           - Id: !Sub "${AWS::StackName}-source-archive"
@@ -421,10 +428,10 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
       PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
+        BlockPublicAcls: false
         BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
     Metadata:
       cfn_nag:
         rules_to_suppress:
@@ -446,10 +453,10 @@ Resources:
             AllowedHeaders: ['*']
             MaxAge: 3000
       PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
+        BlockPublicAcls: false
         BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
@@ -1633,7 +1640,7 @@ Resources:
       ServiceToken: !GetAtt CustomResource.Arn
       SolutionId: SO0021
       UUID: !GetAtt Uuid.UUID
-      Version: "%%VERSION%%"
+      Version: "v5.1.0"
       Transcoder: MediaConvert
       WorkflowTrigger: !Ref WorkflowTrigger
       Glacier: !Ref Glacier
