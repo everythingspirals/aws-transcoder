@@ -319,8 +319,7 @@ Resources:
             Action:
               - s3:GetObject
             Resource: !Sub "arn:${AWS::Partition}:s3:::${Destination}/*"
-            Principal:
-              CanonicalUser: !GetAtt DestinationOriginAccessIdentity.S3CanonicalUserId
+            Principal: "*"
 
   EncodeCompleteRule:
     Type: AWS::Events::Rule
@@ -522,21 +521,13 @@ Resources:
       KmsDataKeyReusePeriodSeconds: 300
       KmsMasterKeyId: alias/aws/sqs
 
-  DestinationOriginAccessIdentity:
-    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
-    Properties:
-      CloudFrontOriginAccessIdentityConfig:
-        Comment: !Sub "access-identity-${Destination}"
-
   CloudFront:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
         Origins:
           - DomainName: !Sub "${Destination}.s3.${AWS::Region}.amazonaws.com"
-            Id: vodS3Origin
-            S3OriginConfig:
-              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${DestinationOriginAccessIdentity}"
+            Id: vodS3Origin            
         Enabled: true
         Logging:
           IncludeCookies: false
