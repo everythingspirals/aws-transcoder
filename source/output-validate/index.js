@@ -108,8 +108,9 @@ exports.handler = async (event) => {
     data.thumbNails = [];
     data.thumbNailsUrls = [];
 
+    let destBucket = data.destBucket.split('/')[0];
     params = {
-      Bucket: data.destBucket.split('/')[0],
+      Bucket: destBucket,
       Prefix: `videos/${data.guid}/thumbnails/`,
     };
 
@@ -117,7 +118,7 @@ exports.handler = async (event) => {
 
     if (thumbNails.Contents.legnth !=0) {
       let lastImg = thumbNails.Contents.pop();
-      data.thumbNails.push(`s3://${data.destBucket}/${lastImg.Key}`);
+      data.thumbNails.push(`s3://${destBucket}/${lastImg.Key}`);
       data.thumbNailsUrls.push(`https://${data.cloudFront}/${lastImg.Key}`);
     } else {
         throw new Error('MediaConvert Thumbnails not found in S3');
