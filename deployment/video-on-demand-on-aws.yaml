@@ -446,6 +446,15 @@ Resources:
       LoggingConfiguration:
         DestinationBucketName: !Ref Logs
         LogFilePrefix: s3-access/
+      NotificationConfiguration:
+        LambdaConfigurations:
+        - Event: 's3:ObjectCreated:*'
+          Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: .0000000.jpg
+          Function: !GetAtt FirstFrame.Arn
       CorsConfiguration:
         CorsRules:
           - AllowedMethods: [GET]
@@ -985,7 +994,63 @@ Resources:
           ErrorHandler: !GetAtt ErrorHandler.Arn
           MediaConvertRole: !GetAtt MediaConvertRole.Arn
           EndPoint: !GetAtt MediaConvertEndPoint.EndpointUrl
-
+          
+   FirstFrameRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub "${AWS::StackName}-first-frame-role"
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*"
+              - Effect: Allow
+                Action:
+                  - s3:Get*
+                Resource:
+                  - !Sub "${Destination.Arn}"
+                  - !Sub "${Destination.Arn}"/*
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "* is used so that the Lambda function can create log groups"
+            
+   FirstFrame:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-first-frame"
+      Description: Copies file to desired location
+      Handler: index.lambda_handler
+      Role: !GetAtt FirstFrameRole.Arn
+      Code:
+        S3Bucket: !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]]
+        S3Key: !Join ["/", [!FindInMap ["SourceCode", "General", "KeyPrefix"], "first-frame.zip"]]
+      Runtime: python3.7
+      Timeout: 120
+      
+   S3InvokeLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt FirstFrame.Arn
+      Principal: s3.amazonaws.com
+      SourceArn: !Sub "${Destination.Arn}"
+            
   OutputValidateRole:
     Type: AWS::IAM::Role
     Properties:
