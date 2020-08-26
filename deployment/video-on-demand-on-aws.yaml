@@ -445,15 +445,6 @@ Resources:
       LoggingConfiguration:
         DestinationBucketName: !Ref Logs
         LogFilePrefix: s3-access/
-      NotificationConfiguration:
-        LambdaConfigurations:
-        - Event: 's3:ObjectCreated:*'
-          Filter:
-              S3Key:
-                Rules:
-                  - Name: suffix
-                    Value: .0000000.jpg
-          Function: !GetAtt FirstFrame.Arn
       CorsConfiguration:
         CorsRules:
           - AllowedMethods: [GET]
@@ -986,7 +977,7 @@ Resources:
           MediaConvertRole: !GetAtt MediaConvertRole.Arn
           EndPoint: !GetAtt MediaConvertEndPoint.EndpointUrl
           
-   FirstFrameRole:
+  FirstFrameRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -1014,14 +1005,14 @@ Resources:
                   - s3:Get*
                 Resource:
                   - !Sub "${Destination.Arn}"
-                  - !Sub "${Destination.Arn}"/*
+                  - !Sub "${Destination.Arn}/*"
     Metadata:
       cfn_nag:
         rules_to_suppress:
           - id: W11
             reason: "* is used so that the Lambda function can create log groups"
             
-   FirstFrame:
+  FirstFrame:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: !Sub "${AWS::StackName}-first-frame"
@@ -1034,13 +1025,13 @@ Resources:
       Runtime: nodejs12.x
       Timeout: 120
       
-   S3InvokeLambdaPermission:
+  S3InvokeLambdaPermission:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
       FunctionName: !GetAtt FirstFrame.Arn
       Principal: s3.amazonaws.com
-      SourceArn: !Sub "${Destination.Arn}"
+      SourceArn: !Ref AWS::AccountId
             
   OutputValidateRole:
     Type: AWS::IAM::Role
