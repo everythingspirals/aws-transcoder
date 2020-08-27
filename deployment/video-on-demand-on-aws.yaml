@@ -110,7 +110,7 @@ Mappings:
   SourceCode:
     General:
       S3Bucket: "vod-stage-solution"
-      KeyPrefix: "video-on-demand-on-aws/v5.1.0"
+      KeyPrefix: "video-on-demand-on-aws/v5.1.0/video-on-demand-on-aws.zip"
   AnonymousData:
     SendAnonymousData:
       Data: Yes
