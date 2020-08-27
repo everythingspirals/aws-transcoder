@@ -109,7 +109,7 @@ Metadata:
 Mappings:
   SourceCode:
     General:
-      S3Bucket: "solutions"
+      S3Bucket: "vod-stage-solution"
       KeyPrefix: "video-on-demand-on-aws/v5.1.0"
   AnonymousData:
     SendAnonymousData:
