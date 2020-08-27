@@ -109,7 +109,7 @@ Metadata:
 Mappings:
   SourceCode:
     General:
-      S3Bucket: "vod-qa-solutions"
+      S3Bucket: "solutions"
       KeyPrefix: "video-on-demand-on-aws/v5.1.0"
   AnonymousData:
     SendAnonymousData:
@@ -319,8 +319,7 @@ Resources:
             Action:
               - s3:GetObject
             Resource: !Sub "arn:${AWS::Partition}:s3:::${Destination}/*"
-            Principal:
-              CanonicalUser: !GetAtt DestinationOriginAccessIdentity.S3CanonicalUserId
+            Principal: "*"
 
   EncodeCompleteRule:
     Type: AWS::Events::Rule
@@ -429,7 +428,7 @@ Resources:
               SSEAlgorithm: AES256
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
-        BlockPublicPolicy: true
+        BlockPublicPolicy: false
         IgnorePublicAcls: false
         RestrictPublicBuckets: false
     Metadata:
@@ -452,9 +451,18 @@ Resources:
             AllowedOrigins: ['*']
             AllowedHeaders: ['*']
             MaxAge: 3000
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: 's3:ObjectCreated:*'
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: .0000000.jpg
+            Function: !GetAtt FirstFrame.Arn
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
-        BlockPublicPolicy: true
+        BlockPublicPolicy: false
         IgnorePublicAcls: false
         RestrictPublicBuckets: false
       BucketEncryption:
@@ -513,12 +521,6 @@ Resources:
       KmsDataKeyReusePeriodSeconds: 300
       KmsMasterKeyId: alias/aws/sqs
 
-  DestinationOriginAccessIdentity:
-    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
-    Properties:
-      CloudFrontOriginAccessIdentityConfig:
-        Comment: !Sub "access-identity-${Destination}"
-
   CloudFront:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -526,8 +528,7 @@ Resources:
         Origins:
           - DomainName: !Sub "${Destination}.s3.${AWS::Region}.amazonaws.com"
             Id: vodS3Origin
-            S3OriginConfig:
-              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${DestinationOriginAccessIdentity}"            
+            S3OriginConfig: {}
         Enabled: true
         Logging:
           IncludeCookies: false
@@ -1009,12 +1010,6 @@ Resources:
                   - logs:PutLogEvents
                 Resource:
                   - !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*"
-              - Effect: Allow
-                Action:
-                  - s3:Get*
-                Resource:
-                  - !Sub "${Destination.Arn}"
-                  - !Sub "${Destination.Arn}/*"
     Metadata:
       cfn_nag:
         rules_to_suppress:
@@ -1068,7 +1063,7 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !GetAtt FirstFrame.Arn
       Principal: s3.amazonaws.com
-      SourceAccount: !Ref AWS::AccountId
+      SourceArn: !Sub 'arn:aws:s3:::${Destination}'
             
   OutputValidateRole:
     Type: AWS::IAM::Role
