@@ -59,8 +59,6 @@ exports.handler = async (event) => {
             enableSqs:JSON.parse(process.env.EnableSqs)
         };
 
-        console.log(data);
-
         switch (event.workflowTrigger) {
             case 'Metadata':
                 console.log('Validating Metadata file::');
