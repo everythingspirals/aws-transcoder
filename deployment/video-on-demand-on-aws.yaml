@@ -319,8 +319,7 @@ Resources:
             Action:
               - s3:GetObject
             Resource: !Sub "arn:${AWS::Partition}:s3:::${Destination}/*"
-            Principal:
-              CanonicalUser: !GetAtt DestinationOriginAccessIdentity.S3CanonicalUserId
+            Principal: "*"
 
   EncodeCompleteRule:
     Type: AWS::Events::Rule
@@ -429,7 +428,7 @@ Resources:
               SSEAlgorithm: AES256
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
-        BlockPublicPolicy: true
+        BlockPublicPolicy: false
         IgnorePublicAcls: false
         RestrictPublicBuckets: false
     Metadata:
@@ -446,24 +445,24 @@ Resources:
       LoggingConfiguration:
         DestinationBucketName: !Ref Logs
         LogFilePrefix: s3-access/
-      NotificationConfiguration:
-        LambdaConfigurations:
-        - Event: 's3:ObjectCreated:*'
-          Filter:
-              S3Key:
-                Rules:
-                  - Name: suffix
-                    Value: .0000000.jpg
-          Function: !GetAtt FirstFrame.Arn
       CorsConfiguration:
         CorsRules:
           - AllowedMethods: [GET]
             AllowedOrigins: ['*']
             AllowedHeaders: ['*']
             MaxAge: 3000
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: 's3:ObjectCreated:*'
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: .0000000.jpg
+            Function: !GetAtt FirstFrame.Arn
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
-        BlockPublicPolicy: true
+        BlockPublicPolicy: false
         IgnorePublicAcls: false
         RestrictPublicBuckets: false
       BucketEncryption:
@@ -522,12 +521,6 @@ Resources:
       KmsDataKeyReusePeriodSeconds: 300
       KmsMasterKeyId: alias/aws/sqs
 
-  DestinationOriginAccessIdentity:
-    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
-    Properties:
-      CloudFrontOriginAccessIdentityConfig:
-        Comment: !Sub "access-identity-${Destination}"
-
   CloudFront:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -535,8 +528,7 @@ Resources:
         Origins:
           - DomainName: !Sub "${Destination}.s3.${AWS::Region}.amazonaws.com"
             Id: vodS3Origin
-            S3OriginConfig:
-              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${DestinationOriginAccessIdentity}"
+            S3OriginConfig: {}
         Enabled: true
         Logging:
           IncludeCookies: false
@@ -995,7 +987,7 @@ Resources:
           MediaConvertRole: !GetAtt MediaConvertRole.Arn
           EndPoint: !GetAtt MediaConvertEndPoint.EndpointUrl
           
-   FirstFrameRole:
+  FirstFrameRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -1018,38 +1010,60 @@ Resources:
                   - logs:PutLogEvents
                 Resource:
                   - !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*"
-              - Effect: Allow
-                Action:
-                  - s3:Get*
-                Resource:
-                  - !Sub "${Destination.Arn}"
-                  - !Sub "${Destination.Arn}"/*
     Metadata:
       cfn_nag:
         rules_to_suppress:
           - id: W11
             reason: "* is used so that the Lambda function can create log groups"
             
-   FirstFrame:
+  FirstFrame:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: !Sub "${AWS::StackName}-first-frame"
       Description: Copies file to desired location
-      Handler: index.lambda_handler
+      Handler: index.handler
       Role: !GetAtt FirstFrameRole.Arn
       Code:
-        S3Bucket: !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]]
-        S3Key: !Join ["/", [!FindInMap ["SourceCode", "General", "KeyPrefix"], "first-frame.zip"]]
-      Runtime: python3.7
+        ZipFile: |
+          const AWS = require('aws-sdk');
+          exports.handler = async (event) => {
+              console.log(`REQUEST:: ${JSON.stringify(event, null, 2)}`);
+
+              const s3 = new AWS.S3();
+
+              try {
+                  const sourceBucket = event['Records'][0]['s3']['bucket']['name'];
+                  const  key = event['Records'][0]['s3']['object']['key'];
+                  const copySource = sourceBucket + '/' + key;
+
+                  const keySplit = key.split('thumbnails');
+                  const newKey = keySplit[0] + 'mobile.jpg';
+
+                  var params = {
+                      Bucket: sourceBucket, 
+                      CopySource: copySource, 
+                      Key: newKey
+                    };
+                    
+                  let result = await s3.copyObject(params).promise();
+                  console.log(result);
+              } catch (err) {
+                  await console.error(event, err);
+                  throw err;
+              }
+
+              return;
+          };
+      Runtime: nodejs12.x
       Timeout: 120
       
-   S3InvokeLambdaPermission:
+  S3InvokeLambdaPermission:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
       FunctionName: !GetAtt FirstFrame.Arn
       Principal: s3.amazonaws.com
-      SourceArn: !Sub "${Destination.Arn}"
+      SourceArn: !Sub 'arn:aws:s3:::${Destination}'
             
   OutputValidateRole:
     Type: AWS::IAM::Role
