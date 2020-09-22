@@ -84,11 +84,10 @@ const getFrameGroup = (event, outputPath) => ({
     OutputGroupSettings: {
         Type: 'FILE_GROUP_SETTINGS',
         FileGroupSettings: {
-            Destination: `${outputPath}/thumbnails/`
+            Destination: `${outputPath}/thumbnails/thumbnail`
         }
     },
     Outputs: [{
-        NameModifier: '_thumb',
         ContainerSettings: {
             Container: 'RAW'
         },
@@ -106,8 +105,8 @@ const getFrameGroup = (event, outputPath) => ({
                 FrameCaptureSettings: {
                     MaxCaptures: 10000000,
                     Quality: 80,
-                    FramerateDenominator: 5,
-                    FramerateNumerator: 1
+                    FramerateDenominator: 30,
+                    FramerateNumerator: 30
                 },
                 Codec: 'FRAME_CAPTURE'
             },

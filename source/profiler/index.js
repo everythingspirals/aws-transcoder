@@ -37,20 +37,63 @@ exports.handler = async (event) => {
         });
 
         let mediaInfo = JSON.parse(event.srcMediainfo);
+        let video = mediaInfo.video[0];
+        let aspectRatio = video && video.aspectRatio;
+        let rotation = video && video.rotation && video.rotation.toString();
+        let isFullscreen = aspectRatio && (parseFloat(aspectRatio, 10).toFixed(2) === "1.33");
+        console.log(aspectRatio, parseFloat(aspectRatio, 10).toFixed(2), isFullscreen);
         event.srcHeight = mediaInfo.video[0].height;
         event.srcWidth = mediaInfo.video[0].width;
+        event.inputRotate = rotation ? ('DEGREES_' + rotation) : 'AUTO';
 
         // Determine encoding by matching the srcHeight to the nearest profile.
-        const landscapeProfiles = [1080, 720, 480, 360, 240];
-        const portraitProfiles = [1920, 1280, 854, 640, 426];
+        //const landscapeProfiles = 
+        //const portraitProfiles = [1920, 1280, 854, 640, 426];
+        const profiles = [1080, 720, 480, 360, 240];
 
-        const profiles = (event.srcHeight > event.srcWidth) ? portraitProfiles : landscapeProfiles;
+        const landscapeTemplate = {
+            1080: event.landscape_1080p,
+            720: event.landscape_720p,
+            480: event.landscape_480p,
+            360: event.landscape_360p,
+            240: event.landscape_240p,
+        };
+
+        const portraitTemplates = {
+            1080: event.portrait_1080p,
+            720: event.portrait_720p,
+            480: event.portrait_480p,
+            360: event.portrait_360p,
+            240: event.portrait_240p
+        }
+
+        const ratiosWide = {
+            1080: 1920,
+            720: 1280,
+            480: 854,
+            360: 640,
+            240: 426
+        };
+
+        const ratiosFull = {
+            1080: 1440,
+            720: 960,
+            480: 640,
+            360: 480,
+            240: 320
+        };
+
+        const ratios = isFullscreen ? ratiosFull : ratiosWide;
+
+        //const profiles = (event.srcHeight > event.srcWidth) ? portraitProfiles : landscapeProfiles;
+        let isPortrait = event.srcHeight > event.srcWidth;
+        const compareBy = isPortrait ? event.srcWidth : event.srcHeight;
 
         let lastProfile;
         let encodeProfile;
 
         profiles.some(p => {
-            let profile = Math.abs(event.srcHeight - p);
+            let profile = Math.abs(compareBy - p);
             if (profile > lastProfile) {
                 return true;
             }
@@ -64,16 +107,13 @@ exports.handler = async (event) => {
 
         if (event.frameCapture) {
             // Match Height x Width with the encoding profile.
-            const ratios = {
-                1080: 1920,
-                720: 1280,
-                480: 854,
-                360: 640,
-                240: 426
-            };
-
-            event.frameCaptureHeight = encodeProfile;
-            event.frameCaptureWidth = ratios[encodeProfile];
+            if (isPortrait) {
+                event.frameCaptureWidth = encodeProfile;
+                event.frameCaptureHeight = ratios[encodeProfile];
+            } else {
+                event.frameCaptureHeight = encodeProfile;
+                event.frameCaptureWidth = ratios[encodeProfile];
+            }
         }
 
         // Update:: added support to pass in a custom encoding Template instead of using the
@@ -81,20 +121,12 @@ exports.handler = async (event) => {
 
         if (!event.jobTemplate) {
             // Match the landscape to the encoding Profile.
-            const jobTemplates = {
-                1080: event.landscape_1080p,
-                720: event.landscape_720p,
-                480: event.landscape_480p,
-                360: event.landscape_360p,
-                240: event.landscape_240p,
-                1920: event.portrait_1080p,
-                1280: event.portrait_720p,
-                854: event.portrait_480p,
-                640: event.portrait_360p,
-                426: event.portrait_240p
-            };
+            const jobTemplates = isPortrait ? portraitTemplates : landscapeTemplate;
+  
+            let jobTemplate = jobTemplates[encodeProfile];
+            jobTemplate = isFullscreen ? jobTemplate + '_FULL' : jobTemplate;
+            event.jobTemplate = jobTemplate;
 
-            event.jobTemplate = jobTemplates[encodeProfile];
             console.log(`Chosen template:: ${event.jobTemplate}`);
 
             event.isCustomTemplate = false;

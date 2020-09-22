@@ -24,14 +24,13 @@ exports.handler = async (event) => {
 
     //Override GUID to ObjectId
     let videoId = key.split('/');
-    let guid = videoId.length && videoId[videoId.length - 1];
-    event.guid = guid;
+    let guid = videoId.length && videoId[videoId.length - 2];
 
     try {
         // Default configuration for the workflow is built using the enviroment variables.
         // Any parameter in config can be overwriten using a metadata file.
         data = {
-            guid: event.guid,
+            guid: guid,
             startTime: moment().utc().toISOString(),
             workflowTrigger: event.workflowTrigger,
             workflowStatus: 'Ingest',
@@ -40,23 +39,23 @@ exports.handler = async (event) => {
             destBucket: process.env.Destination,
             cloudFront: process.env.CloudFront,
             frameCapture: JSON.parse(process.env.FrameCapture),
-            archiveSource:  process.env.ArchiveSource,
-            landscape_2160p: process.env.Landscape_Template_2160p,
-            landscape_1080p: process.env.Landscape_Template_1080p,
-            landscape_720p: process.env.Landscape_Template_720p,
-            landscape_480p: process.env.Landscape_Template_480p,
-            landscape_360p: process.env.Landscape_Template_360p,
-            landscape_240p: process.env.Landscape_Template_240p,
-            portrait_2160p: process.env.Portrait_Template_2160p,
-            portrait_1080p: process.env.Portrait_Template_1080p,
-            portrait_720p: process.env.Portrait_Template_720p,
-            portrait_480p: process.env.Portrait_Template_480p,
-            portrait_360p: process.env.Portrait_Template_360p,
-            portrait_240p: process.env.Portrait_Template_240p,
+            archiveSource: process.env.ArchiveSource,
+            landscape_2160p: 'LANDSCAPE_2160',
+            landscape_1080p: 'LANDSCAPE_1080',
+            landscape_720p: 'LANDSCAPE_720',
+            landscape_480p: 'LANDSCAPE_480',
+            landscape_360p: 'LANDSCAPE_360',
+            landscape_240p: 'LANDSCAPE_240',
+            portrait_2160p: 'PORTRAIT_2160',
+            portrait_1080p: 'PORTRAIT_1080',
+            portrait_720p: 'PORTRAIT_720',
+            portrait_480p: 'PORTRAIT_480',
+            portrait_360p: 'PORTRAIT_360',
+            portrait_240p: 'PORTRAIT_240',
             inputRotate: process.env.InputRotate,
             acceleratedTranscoding: process.env.AcceleratedTranscoding,
-            enableSns:JSON.parse(process.env.EnableSns),
-            enableSqs:JSON.parse(process.env.EnableSqs)
+            enableSns: JSON.parse(process.env.EnableSns),
+            enableSqs: JSON.parse(process.env.EnableSqs)
         };
 
         switch (event.workflowTrigger) {
@@ -64,7 +63,7 @@ exports.handler = async (event) => {
                 console.log('Validating Metadata file::');
 
                 data.srcMetadataFile = key;
- 
+
                 // Download json metadata file from s3
                 const metadata = await s3.getObject({ Bucket: data.srcBucket, Key: key }).promise();
 
