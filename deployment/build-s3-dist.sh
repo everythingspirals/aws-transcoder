@@ -82,7 +82,7 @@ for folder in */ ; do
         # If you're running this command on macOS and Python3 has been installed using Homebrew, you might see this issue:
         #    DistutilsOptionError: must supply either home or prefix/exec-prefix
         # Please follow the workaround suggested on this StackOverflow answer: https://stackoverflow.com/a/44728772
-        python3 setup.py build_pkg --zip-path=$zip_path
+        py setup.py build_pkg --zip-path=$zip_path
     fi
 
     cd ..
