@@ -19,112 +19,171 @@ const DESCRIPTION = 'video on demand on aws';
 
 const qvbrPresets = [
     {
-        name: '_Mp4_Avc_Aac_16x9_1280x720p_24Hz_4.5Mbps_qvbr',
-        file: './lib/mediaconvert/presets/_Mp4_Avc_Aac_16x9_1280x720p_24Hz_4.5Mbps_qvbr.json'
+        name: 'LANDSCAPE_240',
+        file: './lib/landscape-240.json'
     },
     {
-        name: '_Mp4_Avc_Aac_16x9_1920x1080p_24Hz_6Mbps_qvbr',
-        file: './lib/mediaconvert/presets/_Mp4_Avc_Aac_16x9_1920x1080p_24Hz_6Mbps_qvbr.json'
+        name: 'LANDSCAPE_240_FULL',
+        file: './lib/landscape-240-full.json'
     },
     {
-        name: '_Mp4_Hevc_Aac_16x9_3840x2160p_24Hz_20Mbps_qvbr',
-        file: './lib/mediaconvert/presets/_Mp4_Hevc_Aac_16x9_3840x2160p_24Hz_20Mbps_qvbr.json'
+        name: 'PORTRAIT_240',
+        file: './lib/portrait-240.json'
     },
     {
-        name: '_Ott_Dash_Mp4_Avc_16x9_1280x720p_30Hz_6.5Mbps_qvbr',
-        file: './lib/mediaconvert/presets/_Ott_Dash_Mp4_Avc_16x9_1280x720p_30Hz_6.5Mbps_qvbr.json'
+        name: 'PORTRAIT_240_FULL',
+        file: './lib/portrait-240-full.json'
     },
     {
-        name: '_Ott_Dash_Mp4_Avc_16x9_480x270p_15Hz_0.4Mbps_qvbr',
-        file: './lib/mediaconvert/presets/_Ott_Dash_Mp4_Avc_16x9_480x270p_15Hz_0.4Mbps_qvbr.json'
+        name: 'LANDSCAPE_360',
+        file: './lib/landscape-360.json'
     },
     {
-        name: '_Ott_Dash_Mp4_Avc_16x9_1920x1080p_30Hz_8.5Mbps_qvbr',
-        file: './lib/mediaconvert/presets/_Ott_Dash_Mp4_Avc_16x9_1920x1080p_30Hz_8.5Mbps_qvbr.json'
+        name: 'LANDSCAPE_360_FULL',
+        file: './lib/landscape-360-full.json'
     },
     {
-        name: '_Ott_Dash_Mp4_Avc_16x9_640x360p_30Hz_0.6Mbps_qvbr',
-        file: './lib/mediaconvert/presets/_Ott_Dash_Mp4_Avc_16x9_640x360p_30Hz_0.6Mbps_qvbr.json'
+        name: 'PORTRAIT_360',
+        file: './lib/portrait-360.json'
     },
     {
-        name: '_Ott_Dash_Mp4_Avc_16x9_1280x720p_30Hz_3.5Mbps_qvbr',
-        file: './lib/mediaconvert/presets/_Ott_Dash_Mp4_Avc_16x9_1280x720p_30Hz_3.5Mbps_qvbr.json'
+        name: 'PORTRAIT_360_FULL',
+        file: './lib/portrait-360-full.json'
     },
     {
-        name: '_Ott_Dash_Mp4_Avc_16x9_640x360p_30Hz_1.2Mbps_qvbr',
-        file: './lib/mediaconvert/presets/_Ott_Dash_Mp4_Avc_16x9_640x360p_30Hz_1.2Mbps_qvbr.json'
+        name: 'LANDSCAPE_480',
+        file: './lib/landscape-480.json'
     },
     {
-        name: '_Ott_Dash_Mp4_Avc_16x9_1280x720p_30Hz_5.0Mbps_qvbr',
-        file: './lib/mediaconvert/presets/_Ott_Dash_Mp4_Avc_16x9_1280x720p_30Hz_5.0Mbps_qvbr.json'
+        name: 'LANDSCAPE_480_FULL',
+        file: './lib/landscape-480-full.json'
     },
     {
-        name: '_Ott_Dash_Mp4_Avc_16x9_960x540p_30Hz_3.5Mbps_qvbr',
-        file: './lib/mediaconvert/presets/_Ott_Dash_Mp4_Avc_16x9_960x540p_30Hz_3.5Mbps_qvbr.json'
+        name: 'PORTRAIT_480',
+        file: './lib/portrait-480.json'
     },
     {
-        name: '_Ott_Hls_Ts_Avc_Aac_16x9_1280x720p_30Hz_3.5Mbps_qvbr',
-        file: './lib/mediaconvert/presets/_Ott_Hls_Ts_Avc_Aac_16x9_1280x720p_30Hz_3.5Mbps_qvbr.json'
+        name: 'PORTRAIT_480_FULL',
+        file: './lib/portrait-480-full.json'
     },
     {
-        name: '_Ott_Hls_Ts_Avc_Aac_16x9_480x270p_15Hz_0.4Mbps_qvbr',
-        file: './lib/mediaconvert/presets/_Ott_Hls_Ts_Avc_Aac_16x9_480x270p_15Hz_0.4Mbps_qvbr.json'
+        name: 'LANDSCAPE_720',
+        file: './lib/landscape-720.json'
     },
     {
-        name: '_Ott_Hls_Ts_Avc_Aac_16x9_1280x720p_30Hz_5.0Mbps_qvbr',
-        file: './lib/mediaconvert/presets/_Ott_Hls_Ts_Avc_Aac_16x9_1280x720p_30Hz_5.0Mbps_qvbr.json'
+        name: 'LANDSCAPE_720_FULL',
+        file: './lib/landscape-720-full.json'
     },
     {
-        name: '_Ott_Hls_Ts_Avc_Aac_16x9_640x360p_30Hz_0.6Mbps_qvbr',
-        file: './lib/mediaconvert/presets/_Ott_Hls_Ts_Avc_Aac_16x9_640x360p_30Hz_0.6Mbps_qvbr.json'
+        name: 'PORTRAIT_720',
+        file: './lib/portrait-720.json'
     },
     {
-        name: '_Ott_Hls_Ts_Avc_Aac_16x9_1280x720p_30Hz_6.5Mbps_qvbr',
-        file: './lib/mediaconvert/presets/_Ott_Hls_Ts_Avc_Aac_16x9_1280x720p_30Hz_6.5Mbps_qvbr.json'
+        name: 'PORTRAIT_720_FULL',
+        file: './lib/portrait-720-full.json'
     },
     {
-        name: '_Ott_Hls_Ts_Avc_Aac_16x9_640x360p_30Hz_1.2Mbps_qvbr',
-        file: './lib/mediaconvert/presets/_Ott_Hls_Ts_Avc_Aac_16x9_640x360p_30Hz_1.2Mbps_qvbr.json'
+        name: 'LANDSCAPE_1080',
+        file: './lib/landscape-1080.json'
     },
     {
-        name: '_Ott_Hls_Ts_Avc_Aac_16x9_1920x1080p_30Hz_8.5Mbps_qvbr',
-        file: './lib/mediaconvert/presets/_Ott_Hls_Ts_Avc_Aac_16x9_1920x1080p_30Hz_8.5Mbps_qvbr.json'
+        name: 'LANDSCAPE_1080_FULL',
+        file: './lib/landscape-1080-full.json'
     },
     {
-        name: '_Ott_Hls_Ts_Avc_Aac_16x9_960x540p_30Hz_3.5Mbps_qvbr',
-        file: './lib/mediaconvert/presets/_Ott_Hls_Ts_Avc_Aac_16x9_960x540p_30Hz_3.5Mbps_qvbr.json'
+        name: 'PORTRAIT_1080',
+        file: './lib/portrait-1080.json'
+    },
+    {
+        name: 'PORTRAIT_1080_FULL',
+        file: './lib/portrait-1080-full.json'
     }
 ];
 
 const qvbrTemplates = [
     {
-        name: '_Ott_2160p_Avc_Aac_16x9_qvbr',
-        file: './lib/mediaconvert/templates/2160p_avc_aac_16x9_qvbr.json'
+        name: 'LANDSCAPE_240',
+        file: './templates/landscape-240.json'
     },
     {
-        name: '_Ott_1080p_Avc_Aac_16x9_qvbr',
-        file: './lib/mediaconvert/templates/1080p_avc_aac_16x9_qvbr.json'
+        name: 'LANDSCAPE_240_FULL',
+        file: './templates/landscape-240-full.json'
     },
     {
-        name: '_Ott_720p_Avc_Aac_16x9_qvbr',
-        file: './lib/mediaconvert/templates/720p_avc_aac_16x9_qvbr.json'
+        name: 'PORTRAIT_240',
+        file: './templates/portrait-240.json'
+    },
+    {
+        name: 'PORTRAIT_240_FULL',
+        file: './templates/portrait-240-full.json'
+    },
+    {
+        name: 'LANDSCAPE_360',
+        file: './templates/landscape-360.json'
+    },
+    {
+        name: 'LANDSCAPE_360_FULL',
+        file: './templates/landscape-360-full.json'
+    },
+    {
+        name: 'PORTRAIT_360',
+        file: './templates/portrait-360.json'
+    },
+    {
+        name: 'PORTRAIT_360_FULL',
+        file: './templates/portrait-360-full.json'
+    },
+    {
+        name: 'LANDSCAPE_480',
+        file: './templates/landscape-480.json'
+    },
+    {
+        name: 'LANDSCAPE_480_FULL',
+        file: './templates/landscape-480-full.json'
+    },
+    {
+        name: 'PORTRAIT_480',
+        file: './templates/portrait-480.json'
+    },
+    {
+        name: 'PORTRAIT_480_FULL',
+        file: './templates/portrait-480-full.json'
+    },
+    {
+        name: 'LANDSCAPE_720',
+        file: './templates/landscape-720.json'
+    },
+    {
+        name: 'LANDSCAPE_720_FULL',
+        file: './templates/landscape-720-full.json'
+    },
+    {
+        name: 'PORTRAIT_720',
+        file: './templates/portrait-720.json'
+    },
+    {
+        name: 'PORTRAIT_720_FULL',
+        file: './templates/portrait-720-full.json'
+    },
+    {
+        name: 'LANDSCAPE_1080',
+        file: './templates/landscape-1080.json'
+    },
+    {
+        name: 'LANDSCAPE_1080_FULL',
+        file: './templates/landscape-1080-full.json'
+    },
+    {
+        name: 'PORTRAIT_1080',
+        file: './templates/portrait-1080.json'
+    },
+    {
+        name: 'PORTRAIT_1080_FULL',
+        file: './templates/portrait-1080-full.json'
     }
 ];
 
-const mediaPackageTemplates = [
-    {
-        name: '_Ott_2160p_Avc_Aac_16x9_mvod',
-        file: './lib/mediaconvert/templates/2160p_avc_aac_16x9_mvod.json'
-    },
-    {
-        name: '_Ott_1080p_Avc_Aac_16x9_mvod',
-        file: './lib/mediaconvert/templates/1080p_avc_aac_16x9_mvod.json'
-    },
-    {
-        name: '_Ott_720p_Avc_Aac_16x9_mvod',
-        file: './lib/mediaconvert/templates/720p_avc_aac_16x9_mvod.json'
-    }
-];
+const mediaPackageTemplates = [];
 
 // Get the Account regional MediaConvert endpoint for making API calls
 const GetEndpoints = async () => {
