@@ -1,6 +1,6 @@
 {
     "Queue": "arn:aws:mediaconvert:us-east-1:725820426668:queues/Default",
-    "Name": "LANDSCAPE_720",
+    "Name": "LANDSCAPE_480",
     "Settings": {
       "TimecodeConfig": {
         "Source": "ZEROBASED"
@@ -9,10 +9,6 @@
         {
           "Name": "Apple HLS",
           "Outputs": [
-            {
-              "Preset": "LANDSCAPE_720",
-              "NameModifier": "_720p"
-            },
             {
               "Preset": "LANDSCAPE_480",
               "NameModifier": "_480p"
