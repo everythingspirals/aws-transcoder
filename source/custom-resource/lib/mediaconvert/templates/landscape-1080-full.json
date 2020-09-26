@@ -1,6 +1,6 @@
 {
     "Queue": "arn:aws:mediaconvert:us-east-1:725820426668:queues/Default",
-    "Name": "PORTRAIT_1080_FULL",
+    "Name": "LANDSCAPE_1080_FULL",
     "Settings": {
       "TimecodeConfig": {
         "Source": "ZEROBASED"
@@ -10,23 +10,23 @@
           "Name": "Apple HLS",
           "Outputs": [
             {
-              "Preset": "PORTRAIT_1080_FULL",
+              "Preset": "LANDSCAPE_1080_FULL",
               "NameModifier": "_1080p"
             },
             {
-              "Preset": "PORTRAIT_720_FULL",
+              "Preset": "LANDSCAPE_720_FULL",
               "NameModifier": "_720p"
             },
             {
-              "Preset": "PORTRAIT_480_FULL",
+              "Preset": "LANDSCAPE_480_FULL",
               "NameModifier": "_480p"
             },
             {
-              "Preset": "PORTRAIT_360_FULL",
+              "Preset": "LANDSCAPE_360_FULL",
               "NameModifier": "_360p"
             },
             {
-              "Preset": "PORTRAIT_240_FULL",
+              "Preset": "LANDSCAPE_240_FULL",
               "NameModifier": "_240p"
             }
           ],
@@ -83,4 +83,3 @@
     "StatusUpdateInterval": "SECONDS_60",
     "Priority": 0,
     "HopDestinations": []
-  }

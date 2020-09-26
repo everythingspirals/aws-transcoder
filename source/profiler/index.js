@@ -40,16 +40,21 @@ exports.handler = async (event) => {
         let video = mediaInfo.video[0];
         let aspectRatio = video && video.aspectRatio;
         let rotation = video && video.rotation && video.rotation.toString();
+        let isRotated = video && video.rotation == 90;
         let isFullscreen = aspectRatio && (parseFloat(aspectRatio, 10).toFixed(2) === "1.33");
         console.log(aspectRatio, parseFloat(aspectRatio, 10).toFixed(2), isFullscreen);
-        event.srcHeight = mediaInfo.video[0].height;
-        event.srcWidth = mediaInfo.video[0].width;
-        event.inputRotate = rotation ? ('DEGREES_' + rotation) : 'AUTO';
+        const height = mediaInfo.video[0].height;
+        const width = mediaInfo.video[0].width;
+        event.srcHeight = isRotated ? width : height;
+        event.srcWidth = isRotated ? height : width;
+        let isPortrait = event.srcHeight > event.srcWidth;
+        let isSquare = height == width;
 
+        //event.inputRotate = rotation ? ('DEGREES_' + rotation) : 'AUTO';
+        event.inputRotate = 'AUTO';
         // Determine encoding by matching the srcHeight to the nearest profile.
-        //const landscapeProfiles = 
-        //const portraitProfiles = [1920, 1280, 854, 640, 426];
-        const profiles = [1080, 720, 480, 360, 240];
+        const landscapeProfiles = [1080, 720, 480, 360, 240]
+        const portraitProfiles = [1920, 1280, 854, 640, 426];
 
         const landscapeTemplate = {
             1080: event.landscape_1080p,
@@ -85,23 +90,29 @@ exports.handler = async (event) => {
 
         const ratios = isFullscreen ? ratiosFull : ratiosWide;
 
-        //const profiles = (event.srcHeight > event.srcWidth) ? portraitProfiles : landscapeProfiles;
-        let isPortrait = event.srcHeight > event.srcWidth;
-        const compareBy = isPortrait ? event.srcWidth : event.srcHeight;
+        const profiles = isPortrait ? portraitProfiles : landscapeProfiles;
+        const compareBy = isPortrait ? event.srcHeight : event.srcWidth;
 
         let lastProfile;
         let encodeProfile;
 
-        profiles.some(p => {
+        console.log('Finding profile...');
+
+        profiles.some((p,i) => {
             let profile = Math.abs(compareBy - p);
             if (profile > lastProfile) {
                 return true;
             }
 
-            encodeProfile = p;
-            lastProfile = profile;
+            console.log(compareBy, p);
+            if (compareBy >= p) {
+                console.log('Setting profile to ', p);
+                encodeProfile = landscapeProfiles[i];
+                lastProfile = profile;
+            }
         });
 
+        console.log({ encodeProfile });
         console.log(encodeProfile);
         event.encodingProfile = encodeProfile;
 
@@ -118,13 +129,18 @@ exports.handler = async (event) => {
 
         // Update:: added support to pass in a custom encoding Template instead of using the
         // solution defaults
-
+        console.log(event.srcWidth, event.srcHeight, isPortrait);
+        console.log(event.jobTemplate);
         if (!event.jobTemplate) {
             // Match the landscape to the encoding Profile.
             const jobTemplates = isPortrait ? portraitTemplates : landscapeTemplate;
-  
+
             let jobTemplate = jobTemplates[encodeProfile];
-            jobTemplate = isFullscreen ? jobTemplate + '_FULL' : jobTemplate;
+
+            let postFix = '';
+            if (isFullscreen) postFix = '_FULL';
+            if (isSquare) postFix = '_SQUARE';
+            jobTemplate = jobTemplate + postFix;
             event.jobTemplate = jobTemplate;
 
             console.log(`Chosen template:: ${event.jobTemplate}`);

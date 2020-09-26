@@ -14,6 +14,7 @@
 const AWS = require('aws-sdk');
 const error = require('./lib/error.js');
 const _ = require('lodash');
+const { IoT1ClickDevicesService } = require('aws-sdk');
 
 const getMp4Group = (outputPath) => ({
     Name: 'File Group',
@@ -123,6 +124,22 @@ const applySettingsIfNeeded = (isCustomTemplate, originalGroup, customGroup) => 
     return originalGroup;
 };
 
+const pad = (num) => {
+    return num.toString().padStart(2, '0');
+}
+
+const getTimeCode = (cue) => {
+    cue = cue && cue.toString().split('.');
+    let s = parseInt(cue[0], 10);
+    console.log(s);
+    let ms = parseFloat(cue[1], 10);
+    console.log(ms);
+    let f = ms ? parseInt((ms / 33), 10) : 0;
+    console.log(f);
+
+    return `00:00:${pad(s)}:${pad(f)}`;
+}
+
 exports.handler = async (event) => {
     console.log(`REQUEST:: ${JSON.stringify(event, null, 2)}`);
 
@@ -143,30 +160,55 @@ exports.handler = async (event) => {
                 workflow: event.workflowName
             },
             Settings: {
-                Inputs: [{
-                    AudioSelectors: {
-                        'Audio Selector 1': {
-                            Offset: 0,
-                            DefaultSelection: 'NOT_DEFAULT',
-                            ProgramSelection: 1,
-                            SelectorType: 'TRACK'
-                        }
-                    },
-                    VideoSelector: {
-                        ColorSpace: 'FOLLOW',
-                        Rotate: event.inputRotate
-                    },
-                    FilterEnable: 'AUTO',
-                    PsiControl: 'USE_PSI',
-                    FilterStrength: 0,
-                    DeblockFilter: 'DISABLED',
-                    DenoiseFilter: 'DISABLED',
-                    TimecodeSource: 'EMBEDDED',
-                    FileInput: inputPath,
-                }],
+                Inputs: [
+                    {
+                        AudioSelectors: {
+                            'Audio Selector 1': {
+                                Offset: 0,
+                                DefaultSelection: 'NOT_DEFAULT',
+                                ProgramSelection: 1,
+                                SelectorType: 'TRACK'
+                            }
+                        },
+                        VideoSelector: {
+                            ColorSpace: 'FOLLOW',
+                            Rotate: event.inputRotate
+                        },
+                        FilterEnable: 'AUTO',
+                        PsiControl: 'USE_PSI',
+                        FilterStrength: 0,
+                        DeblockFilter: 'DISABLED',
+                        DenoiseFilter: 'DISABLED',
+                        TimecodeSource: "SPECIFIEDSTART",
+                        FileInput: inputPath,
+                    }],
                 OutputGroups: []
             }
         };
+
+        let { cueStart, cueEnd } = event;
+
+        let clippings = {
+            StartTimecode: '00:00:00:00'
+        };
+
+        if (cueStart || cueEnd) {
+            if (cueStart) {
+                clippings.StartTimecode = getTimeCode(cueStart);
+            }
+
+            if (cueEnd) {
+                clippings.EndTimecode = getTimeCode(cueEnd);
+            }
+        }
+
+        let input = job.Settings.Inputs[0];
+        if (input) {
+            input.InputClippings = [clippings];
+            job.Settings.Inputs[0] = input;
+        }
+
+        console.log(cueStart, cueEnd, clippings);
 
         const mp4 = getMp4Group(outputPath);
         const hls = getHlsGroup(outputPath);
@@ -224,8 +266,8 @@ exports.handler = async (event) => {
         //if enabled the TimeCodeConfig needs to be set to ZEROBASED not passthrough
         //https://docs.aws.amazon.com/mediaconvert/latest/ug/job-requirements.html
         if (event.acceleratedTranscoding === 'PREFERRED' || event.acceleratedTranscoding === 'ENABLED') {
-            job.AccelerationSettings = {"Mode" : event.acceleratedTranscoding}
-            job.Settings.TimecodeConfig = {"Source" : "ZEROBASED"}
+            job.AccelerationSettings = { "Mode": event.acceleratedTranscoding }
+            job.Settings.TimecodeConfig = { "Source": "ZEROBASED" }
             job.Settings.Inputs[0].TimecodeSource = "ZEROBASED"
         }
 

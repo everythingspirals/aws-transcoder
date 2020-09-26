@@ -14,17 +14,33 @@
 const moment = require('moment');
 const AWS = require('aws-sdk');
 const error = require('./lib/error');
-
 exports.handler = async (event) => {
     console.log(`REQUEST:: ${JSON.stringify(event, null, 2)}`);
 
     const s3 = new AWS.S3();
     let data;
     const key = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, " "));
-
-    //Override GUID to ObjectId
     let videoId = key.split('/');
     let guid = videoId.length && videoId[videoId.length - 2];
+
+    //Connect to db
+    const MongoDB = require('mongodb');
+    const ObjectId = MongoDB.ObjectID;
+    const MongoClient = MongoDB.MongoClient;
+    const MONGODB_URI = process.env.MONGODB_URI;
+    let video = await new Promise((resolve, reject) => {
+        MongoClient.connect(MONGODB_URI, { native_parser: true }, function (err, db) {
+            if (err) { console.log(err); reject(err); }
+            console.log({ _id: guid });
+            db.collection('videos').findOne({ _id: ObjectId(guid) }, { cueStart: 1, cueEnd: 1 }, function (err, result) {
+                if (err) { console.log(err); reject(err); }
+                console.log(result);
+                resolve(result);
+            });
+        });
+    });
+
+    console.log(video);
 
     try {
         // Default configuration for the workflow is built using the enviroment variables.
@@ -52,6 +68,8 @@ exports.handler = async (event) => {
             portrait_480p: 'PORTRAIT_480',
             portrait_360p: 'PORTRAIT_360',
             portrait_240p: 'PORTRAIT_240',
+            cueStart: video && video.cueStart,
+            cueEnd: video && video.cueEnd,
             inputRotate: process.env.InputRotate,
             acceleratedTranscoding: process.env.AcceleratedTranscoding,
             enableSns: JSON.parse(process.env.EnableSns),

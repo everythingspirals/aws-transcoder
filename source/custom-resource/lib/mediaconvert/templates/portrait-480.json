@@ -1,5 +1,5 @@
 {
-    "Queue": "arn:aws:mediaconvert:us-east-1:725820426668:queues/Default",
+    "Queue": "arn:aws:mediaconvert:us-east-1:892399528512:queues/Default",
     "Name": "PORTRAIT_480",
     "Settings": {
       "TimecodeConfig": {
